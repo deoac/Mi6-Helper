@@ -12,29 +12,29 @@ use Ask;
 if not @*ARGS.elems {
     print qq:to/HERE/;
     Usage: {$*PROGRAM.basename} <mode> [options...]
-    
+
     CAUTION: Ensure all user code is committed before using the 'docs' option
              with the 'old' mode.
 
     Modes:
-        new=X - Creates a new module (named X) directory by driving 'mi6', then 
-                changing certain files in the new repo to conform to the 'docs' 
+        new=X - Creates a new module (named X) directory by driving 'mi6', then
+                changing certain files in the new repo to conform to the 'docs'
                 option.  It also uses the 'provides' option for a short
                 description of its main purpose.
 
         old   - NOT YET IMPLEMENTED
-                Creates safe defaults for an 'mi6'-managed module in an existing 
-                Git Raku module repository. Reports findings and recommendations. 
+                Creates safe defaults for an 'mi6'-managed module in an existing
+                Git Raku module repository. Reports findings and recommendations.
                 See details in the README.
 
     Options:
         dir=X       - Selects directory X for the operations, default is '.'
         force       - Allow overwriting 'dist.ini'
-        docs        - Used with the 'old' mode: uses file 'docs/README.rakudoc' 
+        docs        - Used with the 'old' mode: uses file 'docs/README.rakudoc'
                       to produce 'README.md'. Note extra preparation is REQUIRED
                       by the user before using it.
-        provides=X  - Either a file X or text X to be used in place of 'blah blah 
-                      blah'. No spaces are allowed in a text entry: use periods 
+        provides=X  - Either a file X or text X to be used in place of 'blah blah
+                      blah'. No spaces are allowed in a text entry: use periods
                       ('.') between words.
         Debug       - For developer use
 
@@ -43,7 +43,7 @@ if not @*ARGS.elems {
 }
 
 # modes
-my $old   = 0; 
+my $old   = 0;
 my $new   = 0;
 # options
 my $force = 0;
@@ -62,8 +62,8 @@ my $old-module;
 
 for @*ARGS {
     when /:i ^o/ { ++$old   }
-    when /:i ^'new=' (\S+) / { 
-        $new-module = ~$0; 
+    when /:i ^'new=' (\S+) / {
+        $new-module = ~$0;
         ++$new;
     }
     when /:i ^f/ { ++$force }
@@ -100,11 +100,11 @@ if $new {
 sub mi6-helper-new(:$debug) is export {
 
     my $debug = 1;
-    
+
     # test module is "Foo::Bar"
     # method mi6-cmd(:$parent-dir, :$new-module) {
     my $o = Mi6::Helper.new;
-    $o.mi6-cmd(:parent-dir($dir), :$new-module, :$debug); 
+    $o.mi6-cmd(:parent-dir($dir), :$new-module, :$debug);
 
     # get the name of the module file to change and move content
     my $modpdir = $new-module;
@@ -123,7 +123,7 @@ sub mi6-helper-new(:$debug) is export {
 
     my @idocfil;
     my @odocfil;
-   
+
     MODLINE: while @imodfil.elems {
         my $line = @imodfil.shift;
         if $line ~~ /^ \h* '=' begin \h+ pod/ {
@@ -156,7 +156,7 @@ sub mi6-helper-new(:$debug) is export {
         }
         @odocfil.push: $line;
     }
-    
+
     # the new 'docs'directory
     mkdir "$modpdir/docs";
     # the new README.rakudoc file:
@@ -168,6 +168,7 @@ sub mi6-helper-new(:$debug) is export {
     # rewrite the module file
     $fh = open $mpath, :w;
     $fh.say($_) for @omodfil;
+    $fh.say($_) for @odocfil;
     $fh.close;
 
     # mod the dist.ini file
@@ -185,7 +186,7 @@ sub mi6-helper-new(:$debug) is export {
     $fh = open $distfil, :w;
     $fh.say($_) for @odistfil;
     $fh.close;
-   
+
     # mod the META6.json file
     if $provides {
         my $jfil = "$modpdir/META6.json";
@@ -265,7 +266,7 @@ else {
     No fez config file found. This program assumes
       the user has a fez account and will be publishing
       this module to the zef archives.
-      You must install fez first. Then execute 
+      You must install fez first. Then execute
       '$ fez register' and follow the instructions.
     HERE
 }
@@ -482,7 +483,7 @@ sub find-modules($dir, :$debug) {
     my %modules; # key: <loc|ext>
     #                       {module-colon-name} = <file-name> = # relative to the primary module's repo dir
     #                                           = 0 # for external modules
- 
+
     for @fils -> $mfil is copy {
         say "  Found local module: $mfil" if $debug;
     }

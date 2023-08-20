@@ -82,25 +82,16 @@ sub mi6-helper-new(:$parent-dir!, :$module-name!, :$provides, :$debug) is export
 
     # the file to strip pod from
     my $modstr = slurp $mpath;
+    say "DEBUG: mpath => $mpath" if $debug;
+    say "DEBUG: modstr => $modstr" if $debug;
     my @imodfil = $modstr.lines;
     my @omodfil;
 
     my @idocfil;
     my @odocfil;
 
-    MODLINE: while @imodfil.elems {
-        my $line = @imodfil.shift;
-        if $line ~~ /^ \h* '=' begin \h+ pod/ {
-            @idocfil.push: $line;
-            last MODLINE;
-        }
-        @omodfil.push: $line;
-    }
-    # put ramaining content in the README.rakudoc file
-    @idocfil.push($_) for @imodfil;
-
-    # treat the README file
-    for @idocfil -> $line is copy {
+    # treat the POD6 section of the file
+    for @imodfil -> $line is rw {
         if $line.contains('blah') {
             if $provides {
                 # bold module name and add new text
@@ -132,8 +123,28 @@ sub mi6-helper-new(:$parent-dir!, :$module-name!, :$provides, :$debug) is export
             HERE
 
         }
-        @odocfil.push: $line;
+#        @odocfil.push: $line;
     }
+    @omodfil = @imodfil.clone;
+#    @omodfil = gather for @imodfil {
+#        take $_ if /^/ ^ff "=begin pod";
+#        take $_ if "=end pod" ff^ /$/;
+#    } # end of @omodfil = gather for @imodfil
+    @odocfil = gather for @imodfil  {
+        take $_ if "=begin pod" ff "=end pod";
+    } # end of @idocfil = gather for @imodfil
+
+#    MODLINE: while @imodfil.elems {
+#        my $line = @imodfil.shift;
+#        if $line ~~ /^ \h* '=' begin \h+ pod/ {
+#            @idocfil.push: $line;
+#            last MODLINE;
+#        }
+#        @omodfil.push: $line;
+#    }
+#    # put ramaining content in the README.rakudoc file
+#    @idocfil.push($_) for @imodfil;
+
 
     # the new 'docs'directory
     mkdir "$modpdir/docs";

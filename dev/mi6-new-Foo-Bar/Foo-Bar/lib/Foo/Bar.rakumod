@@ -21,12 +21,13 @@ Foo::Bar is ...
 
 =head1 AUTHOR
 
-Tom Browder <tbrowder@acm.org>
+Shimon Bollinger <shimon.bollinger@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022 Tom Browder
+Copyright 2022 Shimon Bollinger
 
-This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+This library is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.
 
 =end pod
